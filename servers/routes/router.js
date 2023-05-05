@@ -2,8 +2,10 @@ const express = require("express");
 const router = new express.Router();
 const products = require("../models/ProductsSchema");
 const User = require("../models/userSchema");
+const Seller = require("../models/SellerSchema");
 const bcrypt = require("bcryptjs");
 const authenicate = require("../middleware/authenticate");
+const Products = require("../models/ProductsSchema");
 //products get k liye api
 router.get("/getproducts", async (req, res) => {
   try {
@@ -15,10 +17,43 @@ router.get("/getproducts", async (req, res) => {
   }
 });
 
+
+
+//post the products from seller side.
+router.post('/addsproducts', async (req, res) => {
+  try {
+    const { id, url, detailUrl, title, price, description, discount, tagline } = req.body;
+
+    const product = new Products({
+      id,
+      url,
+      detailUrl,
+      title,
+      price,
+      description,
+      discount,
+      tagline
+    });
+
+    const sdata= await product.save();
+    
+    const sdata2= await Seller.save();
+    console.log(sdata2);
+   
+
+    console.log(sdata +"product sdded by seller successfully");
+
+    res.status(201).send({ message: 'Product added successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error adding product' });
+  }
+});
+
+module.exports = router;
 //get individual data
 
 // getindividual
-
 router.get("/getproductsone/:id", async (req, res) => {
   try {
     const { id } = req.params;
